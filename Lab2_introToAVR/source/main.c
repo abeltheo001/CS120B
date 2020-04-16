@@ -1,8 +1,8 @@
 /*	Author: abeltheo
  * 	Partner(s) Name: 
  *	Lab Section:
- *	Assignment: Lab #2  Exercise #3
- *	Exercise Description: [optional - include for your own benefit]
+ *	Assignment: Lab #2  Exercise #4
+ *	Exercise Description: 
  *
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
@@ -14,30 +14,38 @@
 
 int main(void) {
     /* Insert DDR and PORT initializations */
-	DDRA = 0x00; DDRC = 0xFF;
-	PORTA = 0xFF; PORTC = 0x00;
+	DDRA = 0x00; PORTA = 0xFF; //Set A, B, C to inputs. 
+	DDRB = 0x00; PORTB = 0xFF;
+	DDRC = 0x00; PORTC = 0xFF;
+	DDRD = 0xFF; PORTD = 0x00; //Set D to an output. 
 
-	unsigned char tempA0, tempA1, tempA2, tempA3 = 0x00;
-	unsigned char count = 0x00;
+	unsigned char tempA, tempB, tempC, tempD = 0x00;
 
     while (1) {
-	tempA0 = PINA & 0x01;
-	tempA1 = PINA & 0x02;
-	tempA2 = PINA & 0x04;
-	tempA3 = PINA & 0x08;
-	count = 0x00;
+	tempA = PINA;
+	tempB = PINB;
+	tempC = PINC;
 
-	tempA1 = tempA1 >> 1;
-	tempA2 = tempA2 >> 2;
-	tempA3 = tempA3 >> 3;
+	/* Reminder: use & when to single out bits that dont share a 1. 
+		use | to add 1s from either */  
 
-	count = tempA0 + tempA1 + tempA2 + tempA3;
+	if ((tempA + tempB + tempC) > 0x8C)
+		PORTD = PORTD | 0x01;
+
+	if (tempA > tempC) {
+		if ((tempA - tempC) > 0x50)  {
+			PORTD = PORTD | 0x02; }
+	}
+	else {
+		if ((tempC - tempA) > 0x50) {
+			PORTD = PORTD | 0x02; }
+	}
+
+	tempD = tempA + tempB + tempC;
+	//tempD = tempD << 2;
+	PORTD = tempD | PORTD;
 	
-	if (count == 0x00)
-		PORTC = 0x80 | count;
-	else
-		PORTC = count; 
-	
+		
 	
     }
     return 0;
