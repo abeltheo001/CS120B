@@ -39,6 +39,32 @@ expectPORTC 0
 checkResult
 
 # Add tests below
+test "Test 1"
+set state = Start
+setPINA 0x01
+continue 2
+setPINA 0x00
+continue 2
+expect state Wait
+checkResult
+
+test "Test 2" 
+set state = Start
+setPINA 0x00
+continue 2 
+expect state Init
+checkResult
+
+test "Test 3" 
+set state = Start 
+setPINA 0x01 
+continue 2 
+setPINA 0x01
+continue 2 
+setPINA 0x01 
+continue 2 
+expect state Wait
+checkResult
 
 # Report on how many tests passed/tests ran
 set $passed=$tests-$failed
