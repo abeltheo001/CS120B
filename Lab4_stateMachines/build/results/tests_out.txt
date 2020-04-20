@@ -1,11 +1,7 @@
-Breakpoint 1 at 0x3dc: file source/main.c, line 110.
+Breakpoint 1 at 0x14c: file source/main.c, line 23.
 Note: automatically using hardware breakpoints for read-only addresses.
 ======================================================
 Running all tests..."
 
-"Test 1"..."Test 2"...
-	Expected 0x08 
-	PORTC '0x800028:	0x06
-
-	Expected wait but got state:3======================================================
+"TEST 1"..."Wrong combo"...======================================================
 Remote doesn't know how to detach
