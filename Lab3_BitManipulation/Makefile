@@ -1,3 +1,7 @@
+# University of California, Riverside
+# CS120B Makefile
+MMCU=atmega1284
+FREQ=8000000
 
 PATHB=build/
 PATHO=$(PATHB)objects/
@@ -11,7 +15,7 @@ OBJS=$(patsubst $(PATHS)%,$(PATHO)%,$(SOURCES:.c=.o))
 
 CLEAN=rm -rf
 # Simulator
-SIMAVRDIR=~/usr/local/bin/simavr
+SIMAVRDIR=/usr/local/Cellar/simavr/HEAD-ba72122/
 SIMAVR=simavr
 
 # Compiler

@@ -1,0 +1,7 @@
+Breakpoint 1 at 0x14c: file source/main.c, line 23.
+Note: automatically using hardware breakpoints for read-only addresses.
+======================================================
+Running all tests..."
+
+"TEST 1"..."Wrong combo"...======================================================
+Remote doesn't know how to detach
