@@ -1,0 +1,31 @@
+Breakpoint 1 at 0x12a: file source/main.c, line 20.
+Note: automatically using hardware breakpoints for read-only addresses.
+The "remote" target does not support "run".  Try "help target" or "continue".
+List of classes of commands:
+
+aliases -- Aliases of other commands
+breakpoints -- Making program stop at certain points
+data -- Examining data
+files -- Specifying and examining files
+internals -- Maintenance commands
+obscure -- Obscure features
+running -- Running the program
+stack -- Examining the stack
+status -- Status inquiries
+support -- Support facilities
+tracepoints -- Tracing of program execution without stopping the program
+user-defined -- User-defined commands
+
+Type "help" followed by a class name for a list of commands in that class.
+Type "help all" for the list of all commands.
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+The "remote" target does not support "run".  Try "help target" or "continue".
+Continuing.
+Undefined command: "status".  Try "help".
+Type commands for breakpoint(s) 1, one per line.
+End with a line saying just "end".
+Undefined command: "exit".  Try "help".
+Detaching from program: /home/lab/UCRCS120B_AVRTools/labChip/build/objects/main.elf, Remote target
+Remote doesn't know how to detach
