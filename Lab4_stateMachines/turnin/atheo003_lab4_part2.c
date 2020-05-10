@@ -42,22 +42,16 @@ void Light() {
 			break;
 
 		case wait:
-			if (A0 && !A1)
-				state = increase;
-			else if (A1 && !A0)
-				state = decrease;
-			else if (A0 && A1)
+			if (A0 && A1)
 				state = reset;
+			else if (!A0 && !A1)
+				state = init;
 			else
 				state = wait;
 			break;
 
 		case reset: 
-			if (A0 && !A1)
-				state = increase;
-			else if (A1 && !A0)
-				state = decrease;
-			else if (A0 && A1)
+			if (A0 && A1)
 				state = reset;
 			else
 				state = wait;
@@ -82,10 +76,14 @@ void Light() {
 		case increase: 
 			if (PORTC < 0x09)
 				PORTC++;
+			else 
+				PORTC = 0x09;
 			break;
 		case decrease: 
 			if (PORTC > 0x00)
 				PORTC--;
+			else
+				PORTC = 0x00;
 			break;
 		case wait:
 			break;

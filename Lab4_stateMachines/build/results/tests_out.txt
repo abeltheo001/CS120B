@@ -1,7 +1,11 @@
-Breakpoint 1 at 0x14c: file source/main.c, line 23.
+Breakpoint 1 at 0x154: file source/main.c, line 23.
 Note: automatically using hardware breakpoints for read-only addresses.
 ======================================================
 Running all tests..."
 
-"TEST 1"..."Wrong combo"...======================================================
+"TEST 1"...
+	Expected 0x01 
+	PORTB '0x800025:	0x00
+
+	Expected unlock2 but got state:0"Wrong combo"...======================================================
 Remote doesn't know how to detach

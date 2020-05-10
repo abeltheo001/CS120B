@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
-enum States {start, lock, unlock1, unlock2} state;
+enum States {lock, pause, pause2, unlock1, unlock2} state;
 #endif
 void Light();
 
@@ -18,7 +18,7 @@ int main(void) {
 
 	DDRA = 0x00; PORTA = 0xFF;
 	DDRB = 0xFF; PORTB = 0x00;
-	
+	state = lock;
 	while (1) { 	
 		Light();
 	} 
@@ -34,23 +34,23 @@ void Light() {
 	unsigned char INSIDE = PINA & 0x80;
 
 	switch(state){ //Transitions
-		case start: 
-			state = lock; 
-			break;
-
+	
 		case lock: 
 			if (INSIDE) 
 				state = lock;
 			
 			else {
 				if (NUM && !Y && !X)
-					state = unlock1;
+					state = pause;
 				else 
 					state = lock;
 			}
 
 			break;
 
+		case pause:
+			state = unblock1;
+			break;
 		case unlock1:
 			if (INSIDE) 
 				state = lock;
@@ -63,7 +63,10 @@ void Light() {
 			}
 
 			break;
-		
+		case pause2:
+			state = unblock2;
+			break;
+
 		case unlock2: 
 			if (INSIDE) 
 				state = lock;
@@ -75,17 +78,18 @@ void Light() {
 			break;
 
 		default: 
-			state = start;
+			state = lock;
 			break;
 
 	}
 
 
 	switch(state){ //State
-		case start:
-			break;
+
 		case lock:
 			PORTB = 0x00;
+			break;
+		case pause:
 			break;
 		case unlock1:
 			break;

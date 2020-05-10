@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
-enum States {Start, Init, Press, Wait} state;
+enum States {Start, Init, Press, Release,Wait} state;
 #endif
 
 void Light() {
@@ -28,14 +28,24 @@ void Light() {
 				state = Init;
 			break;
 		case Press: 
-			state = Wait;
+			if (A0 == 0x01)
+				state = Press;
+			else 
+				state = Release;
 			break;
+		case Release:
+			if (A0 == 0x01)
+				state = Wait;
+			else
+				state = Release;
+			break;	
 		case Wait:
 			if (A0 == 0x01)
 				state = Init;
-			else 
+			else
 				state = Wait;
-			break;		
+			break;
+
 		default: 
 			state = Start;
 			break;
@@ -53,11 +63,14 @@ void Light() {
 		case Press:
 			PORTB = 0x02;
 			break;
-		case Wait:
+		case Release:
 			PORTB = 0x02;
+			break;
+		case Wait:
+			break;
 		default:
 			PORTB = 0x01;
-		break; 
+			break; 
 
 
 	}
