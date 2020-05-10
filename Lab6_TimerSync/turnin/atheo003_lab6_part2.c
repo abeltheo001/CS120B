@@ -21,7 +21,7 @@ enum States {start, light, press, hold} state;
 void Tick()
 {
 	unsigned char button = ~PINA & 0x01;
-		switch(state) { //Transitions
+	switch(state) { //Transitions
 		case start: 
 			state = light;
 			break;
@@ -33,16 +33,13 @@ void Tick()
 			break;
 		case press:
 			if (button)
+				state = hold;
+			else 
 				state = press;
-			else 
-				state = hold;
 			break;
-		case hold: 
-			if (button)
-				state = light;
-			else 
-				state = hold;
-			break; 
+		case hold:
+			state = light;
+			break;
 		}
 
 	switch(state) { //state 
@@ -70,20 +67,14 @@ void Tick()
 			
 			}
 			break;
-		case press:
+		case press:			
 			break;
 		case hold:
-			if (button)
-				break;
-			else {
-			if (temp == 0x02) PORTB = 0x01;
-			if (temp == 0x01) PORTB = 0x02;
-			if (temp == 0x00) {
-				PORTB = 0x04;
-				temp = 0x03;
-			}
-			}
+			temp = 0x03;
+			direction = 0x00;
+			PORTB = 0x01;
 			break;
+			
 		}
 }
 
