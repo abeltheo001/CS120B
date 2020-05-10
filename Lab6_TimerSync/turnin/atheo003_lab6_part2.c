@@ -13,66 +13,63 @@
 #include "timer.h"
 #endif
 
-unsigned char temp = 0x03;
 unsigned char direction = 0x00;
 
-enum States {start, light, press, hold} state;
+enum States {start, press, light1, light2, light3} state;
 
 void Tick()
 {
 	unsigned char button = ~PINA & 0x01;
 	switch(state) { //Transitions
 		case start: 
-			state = light;
+			state = light1;
 			break;
-		case light:
+		case light1:
+			direction = 1;
 			if (button)
 				state = press;
 			else
-				state = light;
+				state = light2;
+			break;
+		case light2:
+			if (button)
+				state = press;
+			else 
+			{
+				if (direction == 1)
+					state = light3;
+				else if (direction == 2)
+					state = light1;
+			}
+			break;
+		case light3:
+			direction = 2;
+			if (button)
+				state = press;
+			else 
+				state = light2;
 			break;
 		case press:
 			if (button)
-				state = hold;
+				state = start;
 			else 
 				state = press;
-			break;
-		case hold:
-			state = light;
 			break;
 		}
 
 	switch(state) { //state 
 		case start:
 			break;
-		case light:
-			temp--;
-			if (direction == 0x00) {
-				if (temp == 0x02) PORTB = 0x01;
-				if (temp == 0x01) PORTB = 0x02;
-				if (temp == 0x00) {
-					PORTB = 0x04;
-					temp = 0x03;
-					direction = 0x01;
-				}
-			}
-			else {
-				if (temp == 0x02) PORTB = 0x04;
-				if (temp == 0x01) PORTB = 0x02;
-				if (temp == 0x00) {
-					PORTB = 0x01;
-					temp = 0x03;
-					direction = 0x00;
-				}
-			
-			}
+		case press: 
 			break;
-		case press:			
-			break;
-		case hold:
-			temp = 0x03;
-			direction = 0x00;
+		case light1:
 			PORTB = 0x01;
+			break;
+		case light2:	
+			PORTB = 0x02;
+			break;
+		case light3:
+			PORTB  = 0x04;
 			break;
 			
 		}
