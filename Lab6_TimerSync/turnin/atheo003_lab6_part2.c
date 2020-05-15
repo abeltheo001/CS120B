@@ -14,6 +14,7 @@
 #endif
 unsigned char temp = 0;
 unsigned char direction = 0x00;
+unsigned char total = 0; 
 unsigned char pressed = 0; 
 enum States {start, press, light1, light2, light3,hold} state;
 
