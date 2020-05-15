@@ -1,7 +1,7 @@
 /*	Author: Abel Theodros
  *      Partner(s) Name: 
  *	Lab Section: 24
- *	Assignment: Lab #6  Exercise #3
+ *	Assignment: Lab #6  Exercise #2
  *	Exercise Description: [optional - include for your own benefit]
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -10,117 +10,158 @@
 #include <avr/io.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
-#include "io.h"
 #include "timer.h"
+#include "io.h"
 #endif
-
-enum States {start, select, plus, minus, reset}state;
-unsigned char tempB = 0;
-unsigned char timer = 0;
+unsigned char temp = 0;
+unsigned char direction = 0x00;
+unsigned char total = 5; 
+unsigned char pressed = 0; 
+enum States {start, press, light1, light2, light3,hold} state;
 
 void Tick()
 {
-	unsigned char button1 = ~PINA & 0x01;
-	unsigned char button2 = ~PINA & 0x02;
-
+	unsigned char button = ~PINA & 0x01;
 	switch(state) { //Transitions
 		case start: 
-			state = select;
+			temp = 0;
+			LCD_Cursor(1);
+			LCD_ClearScreen();
+			LCD_WriteData(total + '0');
+			state = light1;
 			break;
-		case select:
-			if (button1)
-				state = plus;
-			if (button2)
-				state = minus;	
-			if (button1 && button2)
-				state = reset;
-			if (!button1 && !button2)
-				state = select;
+		case light1:
+			temp = 1; 
+			direction = 1;
+			if (button){
+				if (total > 0)
+				{
+					total--;
+					LCD_Cursor(1);
+					LCD_ClearScreen();
+					LCD_WriteData(total+'0');
+				}
+				if (total == 0)
+				{
+					LCD_Cursor(1);
+					LCD_ClearScreen();
+					LCD_WriteData(total+'0');
+
+				}
+
+				state = press;}
+			else
+				state = light2;
 			break;
-		case plus:
-			if (button1) {
-				state = plus; }
+		case light2:
+			temp = 2;
+			if (button){
+				if (total < 9)
+				{
+					total++;
+					LCD_Cursor(1);
+					LCD_ClearScreen();
+					LCD_WriteData(total+'0');
+
+				}
+				if (total == 9)
+				{
+					LCD_Cursor(1);
+					LCD_ClearScreen();
+					LCD_DisplayString(3, "Congrats!");
+				}
+				state = press; }
 			else {
-			state = select; }
-			
+				if (direction == 1)
+					state = light3;
+				else if (direction == 2)
+					state = light1;
+			}
 			break;
-		case minus:
-			if (button2) {
-				state = minus; }
-			else {
-			state = select; }
+		case light3:
+			temp = 3;
+			direction = 2;
+			if (button) {
+				if (total > 0){
+					total--;
+					LCD_Cursor(1);
+					LCD_ClearScreen();
+					LCD_WriteData(total+'0');
+
+				}
+				if (total == 0)
+				{
+					LCD_Cursor(1);
+					LCD_ClearScreen();
+					LCD_WriteData(total+'0');
+
+				}
+
+				state = press;
+				}
+			else 
+				state = light2;
 			break;
-		case reset:
-			state = select;
+		case press:
+			if (button)
+				state = hold;
+			else 
+				state = press;
 			break;
-		default:
+		case hold:
+			if (!button)
+				state = start;
+			else
+				state = hold;
+			break;
+		 default:
 			state = start;
-			break;
-	
-				
-	}
-	
-	switch(state) { //States
-		case start: 
-			break;
-		case select:
-			break;
-		case plus:
-			if (tempB < 0x09)
-			{	
-				if (timer >= 10)
-				{
-					tempB++;
-					timer = 0;
-				}
-				else 
-				{
-					timer++;
-				}
-						
-			}
-			break;
-		case minus:
-			if (tempB > 0x00)
-			{
-				if (timer >= 10)
-				{
-					tempB--;
-					timer = 0;
-				}
-				else
-				{
-					timer++;
-				}
-			
-			}
+			total = 5;
 			break;	
-		case reset: 
-			tempB = 0;
-			timer = 0;	
+		}
+
+	switch(state) { //state 
+		case start:
 			break;
-
-	}
-
+		case hold: 
+			if (temp == 1) PORTB = 0x01;
+			if (temp == 2) PORTB = 0x02;
+			if (temp == 3) PORTB = 0x04;
+			break;
+	
+		case press: 
+			if (temp == 1) PORTB = 0x01;
+			if (temp == 2) PORTB = 0x02;
+			if (temp == 3) PORTB = 0x04;
+			break;
+		case light1:
+			PORTB = 0x01;
+			break;
+		case light2:	
+			PORTB = 0x02;
+			break;
+		case light3:
+			PORTB  = 0x04;
+			break;
+			
+		}
 }
+
 
 int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00; PORTA = 0xFF;
+	DDRB = 0xFF; PORTB = 0x00; 
 	DDRC = 0xFF; PORTC = 0x00;
 	DDRD = 0xFF; PORTD = 0x00;
     /* Insert your solution below */
-
-	TimerSet(10);
+	TimerSet(300);
 	TimerOn();
-
 	LCD_init();
 	LCD_ClearScreen();
+
     while (1) {
-//	LCD_Cursor(1);
 	Tick();
-	LCD_ClearScreen();
-	LCD_WriteData(tempB + '0');
 	while (!TimerFlag);
 	TimerFlag = 0;
 	continue;
