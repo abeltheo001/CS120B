@@ -40,36 +40,38 @@ void PWM_off() {
 enum States{start, select, sound1, sound2, sound3}state;
 
 void Tick(){
-	unsigned char check = ~PINA & 0x07;
+	unsigned char button1 = ~PINA & 0x01;
+	unsigned char button2 = ~PINA & 0x02;
+	unsigned char button3 = ~PINA & 0x04;
 
 	switch(state) { //Transition
 	
 		case start: 
 			state = select; break;
 		case select: 
-			if (check == 0x01)
+			if (button1)
 				state = sound1;
-			if (check == 0x02)
+			else if (button2)
 				state = sound2; 
-			if (check == 0x04)
+			else if (button3)
 				state = sound3; 
 			else 
 				state = select;
 			break;
 		case sound1:
-			if (check == 0x01)
+			if (button1)
 				state = sound1;
 			else
 				state = select; 
 			break; 
 		case sound2:
-			if (check == 0x02)
+			if (button2)
 				state = sound2;
 			else
 				state = select;
 			break;
 		case sound3:
-			if (check == 0x04)
+			if (button3)
 				state = sound3;
 			else
 				state = select;
@@ -89,7 +91,7 @@ void Tick(){
 			set_PWM(293.66); break;
 		case sound3:
 			set_PWM(329.63); break; 
-		default: break;
+
 		
 	} 
 }
@@ -105,6 +107,5 @@ int main(void) {
 	while (1) {
 		Tick();
 	}
-	PWM_off();
 	return 1;
 }
