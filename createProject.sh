@@ -60,7 +60,7 @@ EOF
 # Create the Makefile
 echo '# University of California, Riverside' > "$name"/Makefile
 echo '# CS120B Makefile' >> "$name"/Makefile
-echo 'MMCU=atmega1284' >> "$name"/Makefile
+echo 'MMCU=atmega1284p' >> "$name"/Makefile
 echo 'FREQ=8000000' >> "$name"/Makefile
 cat $SCRIPTDIR/templates/MakefileTemplate >> "$name"/Makefile
 
@@ -68,7 +68,7 @@ cat $SCRIPTDIR/templates/MakefileTemplate >> "$name"/Makefile
 cat > "$name"/header/simAVRHeader.h << EOF
 /* Debug information for SimAVR */
 #include <stdio.h>
-#ifndef F_CPU
+ifndef F_CPU
 #define F_CPU $freq
 #endif
 
