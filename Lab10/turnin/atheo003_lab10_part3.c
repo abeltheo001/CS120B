@@ -1,7 +1,7 @@
 /*	Author: Abel Theodros
  * 	Partner(s) Name: 
  *	Lab Section:024
- *	Assignment: Lab #10  Exercise #2
+ *	Assignment: Lab #10  Exercise #3 
  *	Exercise Description: n/a
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -20,8 +20,8 @@ typedef struct task {
 	int (*TickFct)(int);	   // Task tick function 
 } task;
 
-task tasks[3];
-const unsigned short tasksNum = 3; 
+task tasks[4];
+const unsigned short tasksNum = 4; 
 unsigned char threeLEDS = 0x00;
 unsigned char blinkingLED = 0x00;
 unsigned short i, j = 0x00; 
@@ -100,8 +100,65 @@ void BlinkLEDSM()
 	
 }
 
+enum SP_States {sp_start, sp_wait, sp_on, sp_off} sp_state;
+unsigned char vocalCord = 0x00;
+unsigned char t = 0x00;
+
+void Speaker()
+{
+	unsigned char button_A2 = ~PINA & 0x04;
+	switch(sp_state) {
+		case sp_start:
+			sp_state = sp_wait;
+			break;
+		case sp_wait:
+			if (button_A2)
+				sp_state = sp_on;
+			else
+				sp_state = sp_wait;
+			break;
+		case sp_on:
+			if (button_A2)
+				sp_state = sp_off;
+			else
+				sp_state = sp_wait;
+			break;
+		case sp_off:
+			if (button_A2)
+				sp_state = sp_on;
+			else
+				sp_state = sp_wait;
+			break;
+	
+		default:
+			sp_state = sp_start;
+			break;
+
+	}
+
+	switch(sp_state) {
+		case sp_start:
+			break;
+
+		case sp_wait:
+			vocalCord = 0x00;
+			break;
+
+		case sp_on:
+			vocalCord = 0x10;
+			break;
+
+		case sp_off:
+			vocalCord = 0x00;
+			break;
+		default:
+			vocalCord = 0x00;
+			break;
+
+	}
+}
+
 enum CM_States {CM_Start} CM_state;
-unsigned char tempB;
 void Tick_Combine()
 {
 	switch(CM_state) { //Transitions
@@ -111,8 +168,7 @@ void Tick_Combine()
 	}
 	switch(CM_state) { //State actions
 		case CM_Start:
-			tempB = blinkingLED |  threeLEDS;
-			PORTB = tempB;
+			PORTB = vocalCord|blinkingLED|threeLEDS;
 			break;
 	}
 	
@@ -125,7 +181,8 @@ int main(void) {
     /* Insert your solution below */
 	unsigned long blinkTime = 1000;
 	unsigned long threeTime = 300;
-	const unsigned long period = 100;
+	unsigned long speakerTime = 2;
+	const unsigned long period = 1;
 	TimerSet(period);
 	TimerOn();
 
@@ -139,14 +196,19 @@ int main(void) {
 			ThreeLEDsSM();
 			threeTime = 0;
 		}
+		if (speakerTime >=2) {
+			Speaker();
+			speakerTime = 0;
+		}
 		Tick_Combine();
 		}
 	else 
-		PORTB = 0x01;
+		PORTB = 0x11;
 	while (!TimerFlag);
 	TimerFlag = 0;
 	blinkTime += period;
 	threeTime += period;
+	speakerTime += period;
     }
     return 1;
 }

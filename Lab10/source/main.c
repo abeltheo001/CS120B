@@ -1,7 +1,7 @@
 /*	Author: Abel Theodros
  * 	Partner(s) Name: 
  *	Lab Section:024
- *	Assignment: Lab #10  Exercise #1
+ *	Assignment: Lab #10  Exercise #4 
  *	Exercise Description: n/a
  *
  *	I acknowledge all content contained herein, excluding template or example
@@ -20,11 +20,36 @@ typedef struct task {
 	int (*TickFct)(int);	   // Task tick function 
 } task;
 
-task tasks[3];
-const unsigned short tasksNum = 3; 
+task tasks[5];
+const unsigned short tasksNum = 5; 
 unsigned char threeLEDS = 0x00;
 unsigned char blinkingLED = 0x00;
 unsigned short i, j = 0x00; 
+
+void set_PWM(double frequency) {
+	static double current_frequency;
+	if (frequency != current_frequency) {
+		if (!frequency) {TCCR3B &= 0x08; }
+		else {TCCR3B |= 0x03;}
+		
+		if (frequency < 0.954) {OCR3A = 0xFFFF;}
+		else if (frequency > 31250) {OCR3A = 0x000;}
+		else {OCR3A = (short){8000000 / (128 * frequency)} - 1;}
+
+		TCNT3 = 0;
+		current_frequency = frequency;
+	}
+}
+void PWM_on() {
+	TCCR3A = (1 << COM3A0);
+	TCCR3B = (1 << WGM32) | (1 << CS31) | (1 << CS30);
+	set_PWM(0);
+}
+
+void PWM_off() {
+	TCCR3A = 0x00;
+	TCCR3B = 0x00;
+}
 
 
 enum TL_States {start, T0, T1, T2} TL_state;
@@ -100,8 +125,120 @@ void BlinkLEDSM()
 	
 }
 
+enum SP_States {sp_start, sp_wait, sp_on, sp_off} sp_state;
+unsigned char vocalCord = 0x00;
+unsigned char t = 0x00;
+
+void Speaker()
+{
+	unsigned char button_A2 = ~PINA & 0x04;
+	switch(sp_state) {
+		case sp_start:
+			sp_state = sp_wait;
+			break;
+		case sp_wait:
+			if (button_A2)
+				sp_state = sp_on;
+			else
+				sp_state = sp_wait;
+			break;
+		case sp_on:
+			if (button_A2)
+				sp_state = sp_off;
+			else
+				sp_state = sp_wait;
+			break;
+		case sp_off:
+			if (button_A2)
+				sp_state = sp_on;
+			else
+				sp_state = sp_wait;
+			break;
+	
+		default:
+			sp_state = sp_start;
+			break;
+
+	}
+
+	switch(sp_state) {
+		case sp_start:
+			break;
+
+		case sp_wait:
+			vocalCord = 0x00;
+			break;
+			
+
+		case sp_on:
+			vocalCord = 0x10;
+			break;
+
+		case sp_off:
+			vocalCord = 0x00;
+			break;
+		default:
+			vocalCord = 0x00;
+			break;
+
+	}
+}
+
+enum FR_States {fr_start, fr_wait, fr_add, fr_sub, fr_pressed} fr_state;
+unsigned char freq = 3;
+void Frequency()
+{
+	unsigned char button1 = ~PINA & 0x01;
+	unsigned char button2 = ~PINA & 0x02;
+	switch(fr_state) { //Transitions 
+		case fr_start:
+			fr_state = fr_wait;
+			break;
+		case fr_wait:
+			if (button1)
+				fr_state = fr_add;
+			else if (button2)
+				fr_state = fr_sub;
+			else
+				fr_state = fr_wait;
+			break;
+		case fr_add:
+			fr_state = fr_pressed;
+			break;
+		case fr_sub:
+			fr_state = fr_pressed;
+			break;
+		case fr_pressed:
+			if (!button1 && !button2)
+				fr_state = fr_wait;
+			else
+				fr_state = fr_pressed;
+			break;
+		default:
+			fr_state = fr_start;
+			break;
+	}
+
+	switch(fr_state) { //State actions 
+		case fr_start:
+			break;
+		case fr_wait:
+			break;
+		case fr_add:
+			freq++;
+			break;
+		case fr_sub:
+			if (freq >= 0)
+				freq--;
+			break;
+		default:
+			break;
+	}
+
+
+}
+
 enum CM_States {CM_Start} CM_state;
-unsigned char tempB;
 void Tick_Combine()
 {
 	switch(CM_state) { //Transitions
@@ -111,8 +248,7 @@ void Tick_Combine()
 	}
 	switch(CM_state) { //State actions
 		case CM_Start:
-			tempB = blinkingLED |  threeLEDS;
-			PORTB = tempB;
+			PORTB = vocalCord|blinkingLED|threeLEDS;
 			break;
 	}
 	
@@ -125,10 +261,12 @@ int main(void) {
     /* Insert your solution below */
 	unsigned long blinkTime = 1000;
 	unsigned long threeTime = 300;
-	const unsigned long period = 100;
+	unsigned long speakerTime = 2;
+	unsigned long frequencyTime = 500;
+	const unsigned long period = 1;
 	TimerSet(period);
 	TimerOn();
-
+	PWM_on();
     while (1) {
 	if ((~PINA & 0x01) == 0) {
 		if (blinkTime >= 1000) {
@@ -139,6 +277,14 @@ int main(void) {
 			ThreeLEDsSM();
 			threeTime = 0;
 		}
+		if (frequencyTime >= 500) {
+			Frequency();
+			frequencyTime = 0;
+		}
+		if (speakerTime >=2) {
+			Speaker();
+			speakerTime = 0;
+		}
 		Tick_Combine();
 		}
 	else 
@@ -147,6 +293,8 @@ int main(void) {
 	TimerFlag = 0;
 	blinkTime += period;
 	threeTime += period;
+	speakerTime += period;
+	frequencyTime += period;
     }
     return 1;
 }
