@@ -19,9 +19,6 @@ typedef enum detect_zc_states { DZCInit,                                    } de
 typedef enum transmit_states {TInit,                                        } transmit_states;
 
 /* shared variables --- fill in as needed */
-unsigned short i,j = 0x00;
-unsigned char tempB;  
-
 
 /* state variables --- do not alter */
 ping_states ping_state;
@@ -39,109 +36,6 @@ transmit_states transmit_state;
 #include "detect_max_amp.h"
 #include "detect_zc.h"
 #include "transmit.h"
-
-void Ping(){
-	switch(ping_state) { //Transitions
-	
-		case PInit: 
-			ping_state = PInit;
-			break;
-			
-
-	}
-	
-	switch(ping_state ) { //State actions 
-		
-		case PInit:
-			if (i < 10) {
-				i++;
-				PORTB = PORTB & 0xFE;
-			}
-			else if (i == 10){
-				PORTB = PORTB | 0x01; 
-				i = 0;
-			}
-			else 
-			 	i = 0; 
-			break;
-
-	}
-}
-
-void Detect_EQ(){
-	switch(detect_eq_state) { //Transitions
-		
-		case DEQInit:
-			if ((~PINA & 0xF8) != 0) {
-				detect_eq_state = DEQBegin; }
-			else {
-				detect_eq_state = DEQInit; 
-			}
-			break;
-
-		case DEQBegin:
-			if ((~PINA & 0xF8) != 0) {
-				detect_eq_state = DEQBegin; }
-			else {
-				detect_eq_state = DEQCheck; 
-			}
-			break;
-
-		case DEQCheck:
-			if (j < 10)
-			{
-				j++;
-				detect_eq_state = DEQCheck;
-			}
-			else if (j == 10)
-			{
-				j = 0;
-				PORTB = PORTB & 0xF8;
-				detect_eq_state = DEQInit;
-			}
-			break;
-	}
-	
-	switch(detect_eq_states) { //State actions 
-		
-		case DEQBegin:
-			PORTB = PORTB | 0x02;  
-			break;
-		default:
-			break;
-	}
-}
-
-
-void Detect_Max_Amp(){
-	switch(detect_max_amp_states) { //Transitions
-
-	}
-	
-	switch(detect_max_amp_states) { //State actions
- 
-	}
-}
-
-void Detect_ZC(){
-	switch(detect_zc_states) { //Transitions
-
-	}
-	
-	switch(detect_zc_states) { //State actions
- 
-	}
-}
-
-void Transmit(){
-	switch(transmit_states) { //Transitions
-
-	}
-	
-	switch(transmit_states) { //State actions 
-
-	}
-}
 
 
 
