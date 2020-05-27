@@ -1,6 +1,6 @@
-/*	Author: <your name>
- *	Lab Section:
- *  Exam #2
+/*	Author: Abel Theodros
+ *	Lab Section: 24
+ * 	Exam #2
  *
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
@@ -40,6 +40,61 @@ transmit_states transmit_state;
 #include "detect_max_amp.h"
 #include "detect_zc.h"
 #include "transmit.h"
+
+void Ping(){
+	switch(ping_states) { //Transitions
+	
+		case PInit: 
+
+	}
+	
+	switch(ping_states) { //State actions 
+
+	}
+}
+
+void Detect_EQ(){
+	switch(detect_eq_states) { //Transitions
+
+	}
+	
+	switch(detect_eq_states) { //State actions 
+
+	}
+}
+
+
+void Detect_Max_Amp(){
+	switch(detect_max_amp_states) { //Transitions
+
+	}
+	
+	switch(detect_max_amp_states) { //State actions
+ 
+	}
+}
+
+void Detect_ZC(){
+	switch(detect_zc_states) { //Transitions
+
+	}
+	
+	switch(detect_zc_states) { //State actions
+ 
+	}
+}
+
+void Transmit(){
+	switch(transmit_states) { //Transitions
+
+	}
+	
+	switch(transmit_states) { //State actions 
+
+	}
+}
+
+
 
 
 /* main function --- do not alter */
