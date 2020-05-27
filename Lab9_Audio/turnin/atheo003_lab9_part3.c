@@ -126,7 +126,7 @@ int main(void) {
     /* Insert DDR and PORT initializations */
 	DDRA = 0x00; PORTA = 0xFF;
 	DDRB = 0xFF; PORTB = 0x00;
-	TimerSet(650);
+	TimerSet(685);
 	TimerOn();
 	PWM_on();
     /* Insert your solution below */

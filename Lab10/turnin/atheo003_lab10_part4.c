@@ -100,9 +100,9 @@ void Frequency()
 	switch(fr_state) {
 		default:
 			if(button == 0x01 && (freq < 10))
-				freq = tally2+1;
+				freq = tally2++;
 			else if (button == 0x02 && (freq > 0))
-				freq = tally-1;
+				freq = tally--;
 			break;
 	}
 
