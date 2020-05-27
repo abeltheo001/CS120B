@@ -12,16 +12,15 @@
 #include "timer.h"
 
 /* SM state declarations --- fill in as needed */
-typedef enum ping_states { PInit,                                           } ping_states;
-typedef enum detect_eq_states { DEQInit,                                    } detect_eq_states;
+typedef enum ping_states {PInit} ping_states;
+typedef enum detect_eq_states { DEQInit, DEQBegin, DEQCheck} detect_eq_states;
 typedef enum detect_max_amp_states { DMAInit,                               } detect_max_amp_states;
 typedef enum detect_zc_states { DZCInit,                                    } detect_zc_states;
 typedef enum transmit_states {TInit,                                        } transmit_states;
 
 /* shared variables --- fill in as needed */
-
-
-
+unsigned short i,j = 0x00;
+unsigned char tempB;  
 
 
 /* state variables --- do not alter */
@@ -45,21 +44,71 @@ void Ping(){
 	switch(ping_states) { //Transitions
 	
 		case PInit: 
+			ping_states = PInit;
+			break;
+			
 
 	}
 	
 	switch(ping_states) { //State actions 
+		
+		case PInit:
+			if (i < 10) {
+				i++;
+				PORTB = PORTB & 0xFE;
+			}
+			else if (i == 10){
+				PORTB = PORTB | 0x01; 
+				i = 0;
+			}
+			else 
+			 	i = 0; 
+			break;
 
 	}
 }
 
 void Detect_EQ(){
 	switch(detect_eq_states) { //Transitions
+		
+		case DEQInit:
+			if ((~PINA & 0xF8) != 0) {
+				detect_eq_states = DEQBegin; }
+			else {
+				detect_eq_states = DEQInit; 
+			}
+			break;
 
+		case DEQBegin:
+			if ((~PINA & 0xF8) != 0) {
+				detect_eq_states = DEQBegin; }
+			else {
+				detect_eq_states = DEQCheck; 
+			}
+			break;
+
+		case DEQCheck:
+			if (j < 10)
+			{
+				j++;
+				detect_eq_states = DEQCheck;
+			}
+			else if (j == 10)
+			{
+				j = 0;
+				PORTB = PORTB & 0xF8;
+				detect_eq_states = DEQInit;
+			}
+			break;
 	}
 	
 	switch(detect_eq_states) { //State actions 
-
+		
+		case DEQBegin:
+			PORTB = PORTB | 0x02;  
+			break;
+		default:
+			break;
 	}
 }
 
