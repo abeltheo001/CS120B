@@ -41,16 +41,16 @@ transmit_states transmit_state;
 #include "transmit.h"
 
 void Ping(){
-	switch(ping_states) { //Transitions
+	switch(ping_state) { //Transitions
 	
 		case PInit: 
-			ping_states = PInit;
+			ping_state = PInit;
 			break;
 			
 
 	}
 	
-	switch(ping_states) { //State actions 
+	switch(ping_state ) { //State actions 
 		
 		case PInit:
 			if (i < 10) {
@@ -69,21 +69,21 @@ void Ping(){
 }
 
 void Detect_EQ(){
-	switch(detect_eq_states) { //Transitions
+	switch(detect_eq_state) { //Transitions
 		
 		case DEQInit:
 			if ((~PINA & 0xF8) != 0) {
-				detect_eq_states = DEQBegin; }
+				detect_eq_state = DEQBegin; }
 			else {
-				detect_eq_states = DEQInit; 
+				detect_eq_state = DEQInit; 
 			}
 			break;
 
 		case DEQBegin:
 			if ((~PINA & 0xF8) != 0) {
-				detect_eq_states = DEQBegin; }
+				detect_eq_state = DEQBegin; }
 			else {
-				detect_eq_states = DEQCheck; 
+				detect_eq_state = DEQCheck; 
 			}
 			break;
 
@@ -91,13 +91,13 @@ void Detect_EQ(){
 			if (j < 10)
 			{
 				j++;
-				detect_eq_states = DEQCheck;
+				detect_eq_state = DEQCheck;
 			}
 			else if (j == 10)
 			{
 				j = 0;
 				PORTB = PORTB & 0xF8;
-				detect_eq_states = DEQInit;
+				detect_eq_state = DEQInit;
 			}
 			break;
 	}
