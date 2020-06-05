@@ -1,4 +1,4 @@
-# Test file for "Lab11_schedule"
+# Test file for "Lab11_scheduler"
 
 
 # commands.gdb provides the following functions for ease:
