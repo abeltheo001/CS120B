@@ -1,6 +1,6 @@
 /* Debug information for SimAVR */
 #include <stdio.h>
-ifndef F_CPU
+#ifndef F_CPU
 #define F_CPU 8000000
 #endif
 
