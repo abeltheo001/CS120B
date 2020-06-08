@@ -1,13 +1,12 @@
 /*	Author: Abel Theodros 
  *  	Partner(s) Name: n/a
  *	Lab Section: 024
- *	Assignment: Lab #11  Exercise #2
+ *	Assignment: Lab #11  Exercise #1
  *	Exercise Description: [optional - include for your own benefit]
  *
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
  */
-
 #include <avr/io.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
@@ -17,49 +16,58 @@
 #include "timer.h"
 #include "keypad.h"
 #endif
+unsigned char x; 
+enum firstTick_States {start, pressed};
 
-unsigned char i, y;
-unsigned char line = 1; 
+int firstTick(int state)
+{
+	switch (state) {
+		case start:
+			state = pressed; break;
 
-const unsigned char message[66] = {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','C','S','1','2','0','B',' ','i','s',' ','L','e','g','e','n','d','.','.','.','w','a','i','t',' ','f','o','r',' ','i','t',' ','D','A','R','Y','!',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+		case pressed:
+			x = GetKeypadKey();
+			switch(x) {
+				case '\0': PORTB = 0x1F; break;
+				case '1': PORTB = 0x01; break;
+				case '2': PORTB = 0x02; break;
+				case '3': PORTB = 0x03; break;
+				case '4': PORTB = 0x04; break;
+				case '5': PORTB = 0x05; break;
+				case '6': PORTB = 0x06; break;
+				case '7': PORTB = 0x07; break;
+				case '8': PORTB = 0x08; break;
+				case '9': PORTB = 0x09; break;
+				case 'A': PORTB = 0x0A; break;
+				case 'B': PORTB = 0x0B; break;
+				case 'C': PORTB = 0x0C; break;
+				case 'D': PORTB = 0x0D; break;
+				case '*': PORTB = 0x0E; break;
+				case '0': PORTB = 0x00; break;
+				case '#': PORTB = 0x0F; break;
+				default: PORTB = 0x1B; break; //middle LED off. 
+			}
+			state = pressed; 
+			break;
 
-enum LCD_states {start, scroll};
-int LCD_scroll(int state) {
+		default:
+			state = start; 
+			break;
+	}
 		
 	switch(state) {
-		case start:
-			state = scroll;
-			break;
-		
-		case scroll:
-			for (i = 1; i <= 16; i++) {
-				LCD_Cursor(i);
-				LCD_WriteData(message[(i-2)+line]);
-				if (line+1+i == 66)
-					line = 1;
-			}
-			line++;
-			state = scroll;
-
-		
 		default:
-			state = start;
+			PORTB = ~PORTB; 
 			break;
-		
 	}
-		return state;
-	
+	return state;
 }
-
 
 int main(void) {
 
 	DDRA = 0xF0; PORTA = 0x0F; //keypad input 
 	DDRB = 0xFF; PORTB = 0x00; //LED output
 
-	DDRC = 0xFF; PORTC = 0x00; //LCD output
-	DDRD = 0xFF; PORTD = 0x00; //LCD output
-/*
 	static task task1;
 	task *tasks[] = {&task1};
 	const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
@@ -68,7 +76,7 @@ int main(void) {
 	task1.state = 0;
 	task1.period = 2; 
 	task1.elapsedTime = task1.period;
-	task1.TickFct = &LCD_scroll;
+	task1.TickFct = &firstTick;
 	
 	unsigned long GCD = tasks[0] -> period;
 	for (int a = 0; a < numTasks; ++a) {
@@ -77,8 +85,6 @@ int main(void) {
 	
 	TimerSet(GCD);
 	TimerOn();
-	LCD_init();
-	LCD_ClearScreen();
 	
 	unsigned short i; 
 
@@ -94,16 +100,7 @@ int main(void) {
 		TimerFlag = 0; 
 	}
 	return 0;	
-*/
 
-	LCD_init();
-	LCD_ClearScreen();
-	while(1) {
-		LCD_Cursor(1);
-		LCD_ClearScreen();
-		LCD_WriteData(99+'0');
-	}
-	return 0;
 }
 
 
